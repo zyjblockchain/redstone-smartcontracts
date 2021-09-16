@@ -42,7 +42,7 @@ describe('Testing the SmartWeave client', () => {
       protocol: 'http'
     });
 
-    LoggerFactory.INST.logLevel('error');
+    LoggerFactory.INST.logLevel('debug');
 
     smartweave = SmartWeaveNodeFactory.memCached(arweave);
 
@@ -61,7 +61,11 @@ describe('Testing the SmartWeave client', () => {
     contract = smartweave.contract(contractTxId);
     contract.connect(wallet);
 
+    console.log(await arweave.network.getInfo());
+
     await mine();
+
+    console.log(await arweave.network.getInfo());
   });
 
   afterAll(async () => {
@@ -69,6 +73,7 @@ describe('Testing the SmartWeave client', () => {
   });
 
   it('should properly deploy contract with initial state', async () => {
+    console.log('first read');
     expect((await contract.readState()).state.counter).toEqual(555);
   });
 
@@ -77,16 +82,22 @@ describe('Testing the SmartWeave client', () => {
 
     await mine();
 
+    console.log('after write interaction')
+
     expect((await contract.readState()).state.counter).toEqual(556);
   });
 
   it('should properly add another interactions', async () => {
+    console.log(await arweave.network.getInfo());
+
     await contract.writeInteraction({ function: 'add' });
     await mine();
     await contract.writeInteraction({ function: 'add' });
     await mine();
     await contract.writeInteraction({ function: 'add' });
     await mine();
+
+    console.log(await arweave.network.getInfo());
 
     expect((await contract.readState()).state.counter).toEqual(559);
   });
